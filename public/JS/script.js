@@ -287,6 +287,11 @@ formRecuperar?.addEventListener('submit', async (e) => {
   const correo = correoEl.value.trim();
   if (!validarCampo(correoEl, VALIDADORES.correo, 'Ingresa un correo electrónico válido.')) return;
 
+  const btn = e.target.querySelector('button[type="submit"]');
+  const txtOriginal = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
   try {
     const res = await fetch('/api/recuperar-password', {
       method: 'POST',
@@ -301,6 +306,9 @@ formRecuperar?.addEventListener('submit', async (e) => {
     }
   } catch (err) {
     mostrarToast('❌ Error de conexión al solicitar la recuperación.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = txtOriginal;
   }
 });
 
