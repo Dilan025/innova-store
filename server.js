@@ -13,6 +13,7 @@ const helmet = require('helmet');
 const nodemailer = require('nodemailer');
 
 const app = express();
+app.set('trust proxy', 1); // Necesario para que express-rate-limit funcione detrás de Render
 const PORT = process.env.PORT || 3000;
 
 const SECRET_KEY = process.env.JWT_SECRET || 'innova_secreto_super_seguro';
