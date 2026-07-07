@@ -336,7 +336,8 @@ app.post('/api/recuperar-password', recuperarLimiter, (req, res) => {
             
             if (transportadorCorreo) {
                 try {
-                    await transportadorCorreo.sendMail({
+                    // Timeout de 5 segundos para evitar que Render congele la petición
+                    const sendMailPromise = transportadorCorreo.sendMail({
                         from: process.env.EMAIL_USER,
                         to: user.correo,
                         subject: 'Recupera tu contraseña — Innova SCAC',
@@ -345,15 +346,24 @@ app.post('/api/recuperar-password', recuperarLimiter, (req, res) => {
                                <p><a href="${enlace}">${enlace}</a></p>
                                <p>Si no pediste esto, ignora este correo.</p>`
                     });
+
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+                    
+                    await Promise.race([sendMailPromise, timeoutPromise]);
+                    return res.json({ mensaje: '¡Listo! Hemos enviado el enlace de recuperación a tu correo.' });
                 } catch (errCorreo) {
-                    console.error('No se pudo enviar el correo:', errCorreo.message);
-                    console.log('🔗 Enlace de recuperación:', enlace);
-                    return res.status(500).json({ error: 'Hubo un error de conexión al enviar el correo. Intenta de nuevo más tarde.' });
+                    console.error('Error al enviar correo (posible bloqueo de Render):', errCorreo.message);
+                    return res.json({ 
+                        mensaje: 'El correo no se pudo enviar debido a bloqueos de seguridad del hosting gratuito, pero puedes usar este enlace para continuar tu prueba:',
+                        enlace_fallback: enlace 
+                    });
                 }
             } else {
-                console.log('🔗 Enlace de recuperación para', user.correo, ':', enlace);
+                return res.json({ 
+                    mensaje: 'Correo no configurado. Usa este enlace para continuar la prueba:',
+                    enlace_fallback: enlace 
+                });
             }
-            res.json({ mensaje: '¡Listo! Hemos enviado el enlace de recuperación a tu correo.' });
         });
     });
 });

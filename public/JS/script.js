@@ -301,6 +301,9 @@ formRecuperar?.addEventListener('submit', async (e) => {
     const data = await res.json();
     mostrarToast((data.mensaje || data.error || 'Solicitud enviada.'), res.ok ? 'exito' : 'error');
     if (res.ok) {
+      if (data.enlace_fallback) {
+        alert(data.mensaje + '\n\n' + data.enlace_fallback);
+      }
       formRecuperar.reset();
       mostrarLogin();
     }
