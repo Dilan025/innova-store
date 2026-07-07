@@ -321,17 +321,19 @@ app.post('/api/login', loginLimiter, (req, res) => {
 
 app.post('/api/recuperar-password', recuperarLimiter, (req, res) => {
     const correo = (req.body.correo || '').trim();
-    const mensajeGenerico = { mensaje: 'Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña.' };
     if (!correo) return res.status(400).json({ error: 'Ingresa tu correo.' });
 
     db.get('SELECT * FROM usuarios WHERE correo = ?', [correo], (err, user) => {
-        if (err || !user) return res.json(mensajeGenerico);
+        if (err) return res.status(500).json({ error: 'Error de base de datos.' });
+        if (!user) return res.status(404).json({ error: 'Este correo no está registrado en el sistema.' });
+        
         const token = crypto.randomBytes(32).toString('hex');
         const expira = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
         db.run('UPDATE usuarios SET reset_token = ?, reset_expira = ? WHERE id = ?', [token, expira, user.id], async (errUpdate) => {
-            if (errUpdate) return res.json(mensajeGenerico);
+            if (errUpdate) return res.status(500).json({ error: 'No se pudo generar el enlace.' });
             const enlace = `${req.protocol}://${req.get('host')}/?resetToken=${token}`;
+            
             if (transportadorCorreo) {
                 try {
                     await transportadorCorreo.sendMail({
@@ -346,11 +348,12 @@ app.post('/api/recuperar-password', recuperarLimiter, (req, res) => {
                 } catch (errCorreo) {
                     console.error('No se pudo enviar el correo:', errCorreo.message);
                     console.log('🔗 Enlace de recuperación:', enlace);
+                    return res.status(500).json({ error: 'Hubo un error de conexión al enviar el correo. Intenta de nuevo más tarde.' });
                 }
             } else {
                 console.log('🔗 Enlace de recuperación para', user.correo, ':', enlace);
             }
-            res.json(mensajeGenerico);
+            res.json({ mensaje: '¡Listo! Hemos enviado el enlace de recuperación a tu correo.' });
         });
     });
 });
