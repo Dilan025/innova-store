@@ -2201,14 +2201,15 @@ async function cargarProductosDestacados() {
 
     // Click en tarjeta → navegar a la categoría
     grid.querySelectorAll('[data-categoria]').forEach(card => {
-      card.addEventListener('click', () => {
+      card.addEventListener('click', async () => {
         const cat = card.dataset.categoria;
         if (cat) {
-          irAVista('vista-catalogos');
-          setTimeout(() => {
-            mostrarProductosDeCategoria(cat);
-            irAVista('vista-detalle-producto');
-          }, 50);
+          if (Object.keys(productosPorCategoriaCache).length === 0) {
+            irAVista('vista-catalogos'); // Muestra el spinner de carga
+            await cargarCategoriasYProductos(); // Espera a que lleguen los productos reales
+          }
+          mostrarProductosDeCategoria(cat);
+          irAVista('vista-detalle-producto');
         }
       });
     });
