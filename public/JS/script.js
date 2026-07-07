@@ -1993,7 +1993,7 @@ function mostrarProductosDeCategoria(nombreCategoria, ordenForzado) {
       </div>
       <div class="cantidad-selector">
         <button type="button" class="cantidad-btn cantidad-restar" data-articulo="${p.id}" aria-label="Restar" ${agotado ? 'disabled' : ''}>−</button>
-        <span class="cantidad-valor" id="cantidad-${p.id}">${cantidadesSeleccionadas[p.id]}</span>
+        <input type="number" class="cantidad-input" id="cantidad-${p.id}" value="${cantidadesSeleccionadas[p.id] || 0}" min="0" max="${p.stock}" ${agotado ? 'disabled' : ''}>
         <button type="button" class="cantidad-btn cantidad-sumar" data-articulo="${p.id}" aria-label="Sumar" ${agotado ? 'disabled' : ''}>+</button>
       </div>
       <button type="button" class="btn-consultar-disponibilidad" data-articulo="${p.id}" ${agotado ? 'disabled' : ''}>${agotado ? 'Sin stock' : 'Consultar disponibilidad'}</button>
@@ -2051,8 +2051,8 @@ function cambiarCantidad(productoId, delta) {
 
   cantidadesSeleccionadas[productoId] = nueva;
 
-  const span = document.getElementById(`cantidad-${productoId}`);
-  if (span) span.textContent = nueva;
+  const input = document.getElementById(`cantidad-${productoId}`);
+  if (input) input.value = nueva;
 
   carritoGlobal[categoriaActual] = { ...cantidadesSeleccionadas };
   guardarCarrito();
@@ -2100,7 +2100,8 @@ function obtenerResumenCarritoCompleto() {
 }
 
 function totalArticulosCarrito() {
-  return obtenerSeleccionCompleta().reduce((total, l) => total + l.cantidad, 0);
+  const seleccion = obtenerSeleccionCompleta();
+  return seleccion.length;
 }
 
 function actualizarBadgeCarrito() {
@@ -2336,6 +2337,62 @@ console.log('📌 Estilo inspirado en BCP con colores propios');
 
 
 // ── CUPONES (Fase 4) ─────────────────────────────────────────────────────────
+document.getElementById('btn-notificaciones')?.addEventListener('click', async (e) => {
+  e.stopPropagation();
+  const dropdown = document.getElementById('notif-dropdown');
+  const body = document.getElementById('notif-dropdown-body');
+  
+  if (dropdown && dropdown.style.display === 'block') {
+    dropdown.style.display = 'none';
+    return;
+  }
+  
+  // Ocultar carrito si está abierto
+  const carritoDropdown = document.getElementById('carrito-dropdown');
+  if (carritoDropdown) carritoDropdown.style.display = 'none';
+
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  try {
+    const res = await fetch('/api/notificaciones', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!res.ok) throw new Error('Error al obtener notificaciones');
+    const data = await res.json();
+    
+    if (body) {
+      if (data.length === 0) {
+        body.innerHTML = '<div class="carrito-vacio-msg">No hay notificaciones nuevas.</div>';
+      } else {
+        body.innerHTML = data.slice(0,10).map(n => `
+          <div style="padding: 10px 15px; border-bottom: 1px solid var(--color-border); font-size: 0.9rem;">
+            ${n.leida ? '📭' : '📬'} ${n.mensaje}
+            <div style="font-size:0.75rem; color:var(--color-texto-mutado); margin-top:4px;">
+               ${new Date(n.fecha).toLocaleString()}
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    if (dropdown) dropdown.style.display = 'block';
+
+    // Mark all as read
+    await fetch('/api/notificaciones/leer-todas', { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token } });
+    setTimeout(cargarNotificaciones, 1000);
+  } catch(e) {}
+});
+
+document.getElementById('btn-cerrar-notif')?.addEventListener('click', () => {
+  const d = document.getElementById('notif-dropdown');
+  if (d) d.style.display = 'none';
+});
+
+// Cerrar notificaciones si se hace clic afuera (el del carrito ya lo hace para el carrito)
+document.addEventListener('click', e => {
+  const dropdown = document.getElementById('notif-dropdown');
+  if (dropdown && dropdown.style.display === 'block' && !e.target.closest('#notif-wrapper')) {
+    dropdown.style.display = 'none';
+  }
+});
 let cuponAplicado = null;
 document.getElementById('btn-validar-cupon')?.addEventListener('click', async () => {
   const inp = document.getElementById('pedido-cupon');
@@ -2744,3 +2801,114 @@ function toggleSearchBar(show) {
   }
 })();
 
+
+// ==========================================
+// LOGICA DEL CARRITO DROPDOWN Y QUANTITY INPUT
+// ==========================================
+
+document.addEventListener('input', e => {
+  if (e.target.classList.contains('cantidad-input')) {
+    const val = parseInt(e.target.value) || 0;
+    const prodId = e.target.id.replace('cantidad-', '');
+    const oldVal = cantidadesSeleccionadas[prodId] || 0;
+    const delta = val - oldVal;
+    
+    if (delta !== 0) {
+       cambiarCantidad(prodId, delta);
+       e.target.value = cantidadesSeleccionadas[prodId] || 0;
+    }
+  }
+});
+
+const btnCarritoDropdown = document.getElementById('btn-carrito-dropdown');
+const btnCerrarCarrito = document.getElementById('btn-cerrar-carrito');
+const carritoDropdown = document.getElementById('carrito-dropdown');
+const carritoBody = document.getElementById('carrito-dropdown-body');
+const carritoTotal = document.getElementById('carrito-dropdown-total');
+const btnProcesarCarrito = document.getElementById('btn-procesar-carrito');
+
+function renderizarCarritoDropdown() {
+  if (!carritoBody) return;
+  
+  const seleccion = obtenerSeleccionCompleta();
+  if (seleccion.length === 0) {
+    carritoBody.innerHTML = '<div class=\"carrito-vacio-msg\">Tu carrito está vacío</div>';
+    if(carritoTotal) carritoTotal.textContent = 'S/ 0.00';
+    if(btnProcesarCarrito) btnProcesarCarrito.disabled = true;
+    return;
+  }
+  
+  if(btnProcesarCarrito) btnProcesarCarrito.disabled = false;
+  
+  let totalSoles = 0;
+  carritoBody.innerHTML = seleccion.map(item => {
+    const pList = productosPorCategoriaCache[item.categoria] || [];
+    const prod = pList.find(p => String(p.id) === String(item.productoId));
+    const precio = prod ? Number(prod.precio) : 0;
+    const subtotal = precio * item.cantidad;
+    totalSoles += subtotal;
+    
+    return 
+      <div class=\"carrito-item\">
+        <div class=\"carrito-item-info\">
+          <span class=\"carrito-item-title\">\x \</span>
+          <span class=\"carrito-item-price\">S/ \</span>
+        </div>
+        <button class=\"carrito-remover-btn\" data-id=\"\\" data-cat=\"\\" title=\"Remover\">✕</button>
+      </div>
+    ;
+  }).join('');
+  
+  if(carritoTotal) carritoTotal.textContent = S/ \;
+}
+
+if (btnCarritoDropdown) {
+  btnCarritoDropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
+    renderizarCarritoDropdown();
+    if(carritoDropdown.style.display === 'none') {
+      carritoDropdown.style.display = 'flex';
+      document.getElementById('notif-dropdown')?.style && (document.getElementById('notif-dropdown').style.display = 'none');
+    } else {
+      carritoDropdown.style.display = 'none';
+    }
+  });
+}
+
+if (btnCerrarCarrito) {
+  btnCerrarCarrito.addEventListener('click', () => {
+    carritoDropdown.style.display = 'none';
+  });
+}
+
+if (carritoBody) {
+  carritoBody.addEventListener('click', e => {
+    const btn = e.target.closest('.carrito-remover-btn');
+    if (btn) {
+      const pid = btn.dataset.id;
+      const cat = btn.dataset.cat;
+      const actual = cantidadesSeleccionadas[pid] || 0;
+      if (actual > 0) {
+        cambiarCantidad(pid, -actual);
+      }
+      renderizarCarritoDropdown();
+      if (categoriaActual === cat) {
+         mostrarProductosDeCategoria(cat);
+      }
+    }
+  });
+}
+
+if (btnProcesarCarrito) {
+  btnProcesarCarrito.addEventListener('click', () => {
+    carritoDropdown.style.display = 'none';
+    const btnDetalle = document.getElementById('btn-detalle-pedir');
+    if (btnDetalle) btnDetalle.click();
+  });
+}
+
+document.addEventListener('click', e => {
+  if (carritoDropdown && carritoDropdown.style.display === 'flex' && !e.target.closest('#carrito-wrapper')) {
+    carritoDropdown.style.display = 'none';
+  }
+});

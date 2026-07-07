@@ -3842,3 +3842,126 @@ body.dark-mode .horario-box { background: #1e1e30 !important; }
   margin-top: 10px;
 }
 .qr-pago-box img { max-width: 160px; border-radius: 8px; margin: 8px auto; display: block; }
+
+/* =========================================================
+   UX IMPROVEMENTS (CARRITO & INPUT)
+   ========================================================= */
+
+/* Estilos para el Dropdown del Carrito */
+.carrito-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 320px;
+  background: var(--color-bg-tarjeta);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.carrito-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.carrito-dropdown-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-texto);
+}
+
+.carrito-dropdown-body {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.carrito-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.carrito-item:last-child {
+  border-bottom: none;
+}
+
+.carrito-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.carrito-item-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-texto);
+}
+
+.carrito-item-price {
+  font-size: 0.85rem;
+  color: var(--color-texto-mutado);
+}
+
+.carrito-remover-btn {
+  background: none;
+  border: none;
+  color: #ff3b30;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.carrito-remover-btn:hover {
+  background: rgba(255,59,48,0.1);
+}
+
+.carrito-dropdown-footer {
+  padding: 15px 20px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.carrito-vacio-msg {
+  text-align: center;
+  padding: 20px;
+  color: var(--color-texto-mutado);
+  font-size: 0.95rem;
+}
+
+/* Estilos para el input numérico en las tarjetas de producto */
+.prod-cant-selector .cantidad-input {
+  width: 50px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  border: none;
+  background: transparent;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.prod-cant-selector .cantidad-input::-webkit-outer-spin-button,
+.prod-cant-selector .cantidad-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.prod-cant-selector .cantidad-input:focus {
+  border-bottom: 2px solid var(--color-primario);
+}

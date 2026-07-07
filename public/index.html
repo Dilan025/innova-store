@@ -188,7 +188,7 @@
         <ul>
           <li><a href="#" class="nav-link active" data-vista="vista-inicio">Inicio</a></li>
           <li><a href="#" class="nav-link" data-vista="vista-catalogos">Categorías</a></li>
-          <li><a href="#" class="nav-link" data-vista="vista-pedido">Pedidos<span class="cart-badge" id="cart-badge-desktop" style="display:none;"></span></a></li>
+          <li><a href="#" class="nav-link" data-vista="vista-pedido">Pedidos</a></li>
           <li><a href="#" class="nav-link" data-vista="vista-nosotros">Nosotros</a></li>
           <li><a href="#" class="nav-link" data-vista="vista-contacto">Contacto</a></li>
           <li><a href="#" class="nav-link" data-vista="vista-mis-pedidos" style="display:none;">Mis Pedidos</a></li>
@@ -197,8 +197,42 @@
       </nav>
 
       <div class="header-actions">
-        <div class="nav-notif-wrapper" id="notif-wrapper" style="display:none;">
+        <!-- CARRITO -->
+        <div class="nav-carrito-wrapper" id="carrito-wrapper" style="display:none; position:relative;">
+          <button id="btn-carrito-dropdown" title="Carrito de Compras" style="background:none;border:none;cursor:pointer;font-size:1.4rem;position:relative;margin-right:8px;">
+            🛒<span class="cart-badge" id="cart-badge-desktop" style="display:none;">0</span>
+          </button>
+          <div class="carrito-dropdown" id="carrito-dropdown" style="display:none;">
+            <div class="carrito-dropdown-header">
+              <h4>Mi Carrito</h4>
+              <button id="btn-cerrar-carrito" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--color-texto);">✕</button>
+            </div>
+            <div class="carrito-dropdown-body" id="carrito-dropdown-body">
+              <!-- Items del carrito -->
+            </div>
+            <div class="carrito-dropdown-footer">
+              <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:700; color:var(--color-texto);">
+                <span>Total Estimado:</span>
+                <span id="carrito-dropdown-total">S/ 0.00</span>
+              </div>
+              <button class="btn-primary" id="btn-procesar-carrito" style="width:100%; font-size:0.9rem;">Procesar Pedido</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-notif-wrapper" id="notif-wrapper" style="display:none; position:relative;">
           <button id="btn-notificaciones" title="Notificaciones" style="background:none;border:none;cursor:pointer;font-size:1.3rem;position:relative;">🔔<span class="notif-badge" id="notif-count" style="display:none;">0</span></button>
+          
+          <!-- DROPDOWN DE NOTIFICACIONES -->
+          <div class="carrito-dropdown" id="notif-dropdown" style="display:none; right: -50px; width: 300px;">
+            <div class="carrito-dropdown-header">
+              <h4>Notificaciones</h4>
+              <button id="btn-cerrar-notif" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--color-texto);">✕</button>
+            </div>
+            <div class="carrito-dropdown-body" id="notif-dropdown-body" style="max-height: 250px;">
+              <!-- Notificaciones aquí -->
+            </div>
+          </div>
         </div>
         <a href="#" class="btn-header btn-abrir-cuenta" id="btn-abrir-cuenta-header">
           <span>Abrir cuenta</span>
@@ -225,7 +259,7 @@
     <ul>
       <li><a href="#" class="nav-link-m active" data-vista="vista-inicio">Inicio</a></li>
       <li><a href="#" class="nav-link-m" data-vista="vista-catalogos">Categorías</a></li>
-      <li><a href="#" class="nav-link-m" data-vista="vista-pedido">Pedidos<span class="cart-badge" id="cart-badge-movil" style="display:none;"></span></a></li>
+      <li><a href="#" class="nav-link-m" data-vista="vista-pedido">Pedidos</a></li>
       <li><a href="#" class="nav-link-m" data-vista="vista-nosotros">Nosotros</a></li>
       <li><a href="#" class="nav-link-m" data-vista="vista-contacto">Contacto</a></li>
       <li><a href="#" class="nav-link-m" data-vista="vista-mis-pedidos" style="display:none;">Mis Pedidos</a></li>
