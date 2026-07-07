@@ -347,14 +347,14 @@ app.post('/api/recuperar-password', recuperarLimiter, (req, res) => {
                                <p>Si no pediste esto, ignora este correo.</p>`
                     });
 
-                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000));
                     
                     await Promise.race([sendMailPromise, timeoutPromise]);
                     return res.json({ mensaje: '¡Listo! Hemos enviado el enlace de recuperación a tu correo.' });
                 } catch (errCorreo) {
                     console.error('Error al enviar correo (posible bloqueo de Render):', errCorreo.message);
                     return res.json({ 
-                        mensaje: 'El correo no se pudo enviar debido a bloqueos de seguridad del hosting gratuito, pero puedes usar este enlace para continuar tu prueba:',
+                        mensaje: 'El correo tardó demasiado o no se pudo enviar. Puedes usar este enlace para continuar tu prueba:',
                         enlace_fallback: enlace 
                     });
                 }
