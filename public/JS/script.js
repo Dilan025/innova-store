@@ -302,7 +302,21 @@ formRecuperar?.addEventListener('submit', async (e) => {
     mostrarToast((data.mensaje || data.error || 'Solicitud enviada.'), res.ok ? 'exito' : 'error');
     if (res.ok) {
       if (data.enlace_fallback) {
-        alert(data.mensaje + '\n\n' + data.enlace_fallback);
+        let div = document.getElementById('fallback-link-box');
+        if (!div) {
+          div = document.createElement('div');
+          div.id = 'fallback-link-box';
+          div.style.marginTop = '15px';
+          div.style.padding = '15px';
+          div.style.backgroundColor = '#fff4e5';
+          div.style.border = '1px solid #ff9800';
+          div.style.borderRadius = '8px';
+          formRecuperar.appendChild(div);
+        }
+        div.innerHTML = `<p style="color:#e65100;margin-bottom:8px;"><b>¡Render bloqueó el correo!</b></p>
+        <p style="font-size:0.9rem;margin-bottom:8px;">El hosting gratuito impidió la salida del correo. Haz clic en este enlace seguro para continuar con el restablecimiento de tu contraseña (o cópialo):</p>
+        <a href="${data.enlace_fallback}" style="word-break:break-all;color:#1a73e8;text-decoration:underline;font-weight:bold;">${data.enlace_fallback}</a>`;
+        return; // Evita hacer reset o cambiar de vista para que el usuario pueda hacer clic
       }
       formRecuperar.reset();
       mostrarLogin();
