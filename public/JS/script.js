@@ -2485,7 +2485,7 @@ async function cargarDashboardCharts() {
         type: 'bar',
         data: {
           labels: (d.pedidos_por_mes || []).map(r => r.mes).reverse(),
-          datasets: [{ label: 'Pedidos', data: (d.pedidos_por_mes || []).map(r => r.total_pedidos).reverse(), backgroundColor: '#ff6a00', borderRadius: 6 }]
+          datasets: [{ label: 'Pedidos', data: (d.pedidos_por_mes || []).map(r => Number(r.total_pedidos)).reverse(), backgroundColor: '#ff6a00', borderRadius: 6 }]
         },
         options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
       });
@@ -2498,7 +2498,7 @@ async function cargarDashboardCharts() {
         type: 'doughnut',
         data: {
           labels: (d.top_productos || []).map(r => r.nombre),
-          datasets: [{ data: (d.top_productos || []).map(r => r.total_vendido), backgroundColor: ['#ff6a00','#ff8c00','#ffb347','#ff2d55','#5856d6','#34c759','#007aff','#ff9500'] }]
+          datasets: [{ data: (d.top_productos || []).map(r => Number(r.total_vendido)), backgroundColor: ['#ff6a00','#ff8c00','#ffb347','#ff2d55','#5856d6','#34c759','#007aff','#ff9500'] }]
         },
         options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
       });
