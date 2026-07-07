@@ -256,24 +256,7 @@ db.serialize(() => {
 });
 
 
-// ── BACKUP AUTOMÁTICO ────────────────────────────────────────────────────────
-const backupDir = path.join(__dirname, 'backups');
-if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
-
-function crearBackup() {
-    const ahora = new Date();
-    const nombre = `innova_${ahora.getFullYear()}${String(ahora.getMonth()+1).padStart(2,'0')}${String(ahora.getDate()).padStart(2,'0')}_${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}.db`;
-    const origen = path.join(__dirname, 'innova.db');
-    const destino = path.join(backupDir, nombre);
-    try {
-        fs.copyFileSync(origen, destino);
-        const archivos = fs.readdirSync(backupDir).filter(f => f.endsWith('.db')).sort();
-        while (archivos.length > 10) fs.unlinkSync(path.join(backupDir, archivos.shift()));
-        console.log('✅ Backup creado:', nombre);
-    } catch (e) { console.error('❌ Error backup:', e.message); }
-}
-crearBackup();
-setInterval(crearBackup, 6 * 60 * 60 * 1000);
+// Backup local deshabilitado por uso de PostgreSQL en la nube
 
 // ── MIDDLEWARES DE AUTENTICACIÓN ─────────────────────────────────────────────
 const verificarToken = (req, res, next) => {
