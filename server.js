@@ -66,7 +66,10 @@ const recuperarLimiter = rateLimit({
 let transportadorCorreo = null;
 if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     transportadorCorreo = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        requireTLS: true,
         auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
     });
 } else {
