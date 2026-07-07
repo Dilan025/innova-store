@@ -1,0 +1,91 @@
+============================================================
+GUÍA DE INSTALACIÓN DEL PROYECTO
+============================================================
+
+1. INSTALAR NODE.JS
+   Asegúrate de tener instalado Node.js en tu equipo. Puedes descargarlo directamente desde este enlace:
+   https://nodejs.org/dist/v24.18.0/node-v24.18.0-x64.msi
+
+2. PREPARAR EL PROYECTO
+   Descomprime el archivo .zip en una carpeta de tu preferencia y ábrela utilizando VSCode (Visual Studio Code).
+
+3. INSTALAR DEPENDENCIAS
+   Abre una terminal integrada en VSCode dentro de la carpeta del proyecto y ejecuta el siguiente comando:
+   npm install
+   
+   *Nota: Esto creará automáticamente la carpeta node_modules con todas las dependencias necesarias.*
+
+4. INICIAR EL SERVIDOR
+   Una vez finalizada la instalación, ejecuta el proyecto con el siguiente comando en una nueva terminal de VSCode:
+   node server.js
+
+5. ACCESO AL PROYECTO (SOLO EN TU COMPUTADORA)
+   Abre tu navegador web y dirígete a: http://localhost:3000
+
+6. CÓMO DETENER EL SERVIDOR
+   - Mantén abierta la terminal donde corre el servidor.
+   - Para detenerlo, presiona: CTRL + C
+
+============================================================
+CÓMO EXPONER EL PROYECTO A INTERNET (NGROK)
+============================================================
+Esto permite que cualquier persona con un link pueda entrar a la página
+mientras el servidor corre en tu computadora (útil para sustentaciones,
+demos o revisiones remotas).
+
+1. INSTALAR NGROK
+   Opción A (recomendada): busca "ngrok" en Microsoft Store e instálalo.
+   Opción B (manual): descarga desde https://ngrok.com/download
+   y descomprime el .zip en una carpeta de tu preferencia.
+
+   Verifica que quedó instalado ejecutando en la cmd :
+   ngrok version
+
+2. CREAR CUENTA GRATIS Y OBTENER TU AUTHTOKEN
+   Regístrate en: https://dashboard.ngrok.com/signup
+   Una vez dentro, copia tu authtoken (aparece en el setup inicial
+   o en "Your Authtoken" dentro del dashboard).
+
+3. CONFIGURAR TU AUTHTOKEN (SOLO LA PRIMERA VEZ)
+   En una terminal, ejecuta el comando que te dio ngrok, con tu propio token:
+   ngrok config add-authtoken TU_TOKEN_AQUI
+
+4. INICIAR EL SERVIDOR (TERMINAL 1)
+   Dentro de la carpeta del proyecto:
+   node server.js
+   Déjala corriendo, no la cierres.
+
+5. ABRIR EL TÚNEL DE NGROK (TERMINAL 2)
+   Sin cerrar la terminal anterior, abre una NUEVA terminal y ejecuta:
+   ngrok http 3000
+
+6. COMPARTIR EL LINK PÚBLICO
+   ngrok mostrará algo como:
+   Forwarding    https://algo-random.ngrok-free.dev -> http://localhost:3000
+
+   Esa URL (https://algo-random.ngrok-free.dev) es la que se comparte
+   o proyecta. Es la página funcionando en internet en tiempo real,
+   directo desde esta computadora.
+
+NOTAS IMPORTANTES:
+   - La primera vez que alguien abre el link en su navegador, ngrok
+     (plan gratis) muestra una pantalla de advertencia ("Visit Site").
+     Es normal, solo hay que darle clic para continuar.
+   - La URL cambia cada vez que se reinicia ngrok (plan gratis). Ábrelo
+     justo antes de necesitarlo y no lo cierres mientras se use.
+   - No cierres NINGUNA de las dos terminales (node server.js y
+     ngrok http 3000) mientras el link deba seguir funcionando.
+   - La computadora debe permanecer encendida, conectada a internet y
+     sin entrar en suspensión durante todo ese tiempo.
+   - Puedes revisar el tráfico y errores en tiempo real entrando a:
+     http://127.0.0.1:4040 (solo visible desde esta misma computadora).
+
+============================================================
+USUARIOS Y CREDENCIALES (HASHES)
+============================================================
+
+Nombre                      Correo                        Hash de Contraseña
+--------------------------------------------------------------------------------------------------------------------------
+Dilan Steven Guerrero Perez guerreroperezdilan@gmail.com  dilan211
+Dilan prueba                dilanstevenx@gmail.com        123456789
+DARIO                       admin@innovascac.com          123456789

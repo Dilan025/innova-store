@@ -1,0 +1,13 @@
+{
+  "name": "Innova SCAC",
+  "short_name": "Innova",
+  "description": "Tienda online de Innova SCAC — DTF, UV, Sublimación y más en Trujillo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff6a00",
+  "icons": [
+    { "src": "IMG/logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "IMG/logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

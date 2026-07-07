@@ -1,0 +1,7 @@
+node_modules/
+innova*.db
+innova*.db-journal
+.env
+.DS_Store
+scratch/
+pg_db_backup.js
