@@ -594,7 +594,7 @@ app.post('/api/pedidos', verificarToken, upload.fields([{ name: 'archivo', maxCo
                 }
 
                 db.run("INSERT INTO pedidos (usuario_id, servicio, cantidad, detalles, archivo, producto_id, metodo_pago, comprobante) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    [req.usuario.id, servicio || producto.nombre, cantidadNum, detalles, archivoUrl, producto.id],
+                    [req.usuario.id, servicio || producto.nombre, cantidadNum, detalles, archivoUrl, producto.id, req.body.metodo_pago, comprobanteUrl],
                     function(errInsert) {
                         if (errInsert) {
                             db.run("UPDATE productos SET stock = stock + ? WHERE id = ?", [cantidadNum, producto.id]);
