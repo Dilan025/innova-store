@@ -1109,7 +1109,7 @@ app.get('/api/admin/estadisticas', verificarToken, requiereAdmin, (req, res) => 
             db.get("SELECT COUNT(*) AS total FROM usuarios WHERE rol = 'cliente'", [], (err2, row2) => {
                 stats.clientes = row2 ? row2.total : 0;
                 db.all(
-                    `SELECT strftime('%Y-%m', fecha) AS mes, COUNT(*) AS total_pedidos
+                    `SELECT TO_CHAR(fecha, 'YYYY-MM') AS mes, COUNT(*) AS total_pedidos
                      FROM pedidos GROUP BY mes ORDER BY mes DESC LIMIT 6`,
                     [], (err3, rows3) => {
                         stats.pedidos_por_mes = rows3 || [];
