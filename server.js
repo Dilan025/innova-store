@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const dns = require('node:dns');
+dns.setDefaultResultOrder('ipv4first');
 const db = require('./pg_db.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
