@@ -948,7 +948,7 @@ let categoriasCache = [];
 async function cargarProductosAdmin() {
   const tbody = document.getElementById('tabla-admin-productos');
   try {
-    const productos = await fetchAdmin('/api/admin/productos');
+    const productos = await fetchAdmin('/api/admin/productos?_t=' + Date.now());
     if (productos.length === 0) {
       tbody.innerHTML = mensajeTablaError(6, 'No hay productos registrados todavía.');
       return;
@@ -1917,8 +1917,8 @@ async function cargarCategoriasYProductos() {
 
   try {
     const [categorias, productos] = await Promise.all([
-      (await fetch('/api/categorias')).json(),
-      (await fetch('/api/productos')).json()
+      (await fetch('/api/categorias?_t=' + Date.now())).json(),
+      (await fetch('/api/productos?_t=' + Date.now())).json()
     ]);
 
     PRODUCTOS_GLOBAL = productos;
