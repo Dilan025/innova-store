@@ -4,7 +4,7 @@
   "description": "Tienda online de Innova SCAC — DTF, UV, Sublimación y más en Trujillo",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#ff6a00",
   "theme_color": "#ff6a00",
   "icons": [
     { "src": "/IMG/logo.png", "sizes": "500x500 any", "type": "image/png" },
