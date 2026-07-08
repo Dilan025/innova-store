@@ -2944,8 +2944,8 @@ window.addEventListener('popstate', () => {
   }
 });
 
-// Al cargar la página, ir a la vista correspondiente si hay un hash
-window.addEventListener('load', () => {
+// Al cargar la página, ir a la vista correspondiente de inmediato
+document.addEventListener('DOMContentLoaded', () => {
   const hash = window.location.hash.substring(1);
   const baseHash = hash.split('/')[0];
   if (baseHash && document.getElementById(baseHash)) {
