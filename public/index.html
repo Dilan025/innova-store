@@ -644,7 +644,7 @@
         <p class="vista-sub">Gestiona productos, categorías, clientes, pedidos y reportes del sistema.</p>
 
         <div class="admin-tabs" id="admin-tabs">
-          <button class="admin-tab active" data-admin-tab="dashboard">📊 Dashboard</button>
+          <button class="admin-tab active" data-admin-tab="dashboard">📊 Resumen General</button>
           <button class="admin-tab" data-admin-tab="productos">🛒 Productos</button>
           <button class="admin-tab" data-admin-tab="categorias">🏷️ Categorías</button>
           <button class="admin-tab" data-admin-tab="clientes">👥 Clientes</button>
@@ -664,16 +664,6 @@
             <div class="admin-kpi"><span class="admin-kpi-valor" id="kpi-productos">–</span><span class="admin-kpi-label">Productos activos</span></div>
             <div class="admin-kpi"><span class="admin-kpi-valor" id="kpi-categorias">–</span><span class="admin-kpi-label">Categorías</span></div>
             <div class="admin-kpi admin-kpi--alerta"><span class="admin-kpi-valor" id="kpi-stock-bajo">–</span><span class="admin-kpi-label">Con stock bajo (&lt; 5)</span></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px;">
-            <div style="background:var(--color-fondo-secundario,#f8fafc);border-radius:12px;padding:16px;">
-              <h4 style="margin-bottom:12px;color:var(--color-texto);">📈 Pedidos por mes</h4>
-              <canvas id="canvas-pedidos-mes" height="200"></canvas>
-            </div>
-            <div style="background:var(--color-fondo-secundario,#f8fafc);border-radius:12px;padding:16px;">
-              <h4 style="margin-bottom:12px;color:var(--color-texto);">🏆 Top productos</h4>
-              <canvas id="canvas-top-productos" height="200"></canvas>
-            </div>
           </div>
           <p class="admin-panel-nota" style="margin-top:12px;">Usa las pestañas de arriba para gestionar cada área del sistema.</p>
         </div>

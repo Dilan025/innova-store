@@ -2552,43 +2552,6 @@ async function cargarDashboardCharts() {
       document.getElementById('kpi-categorias').textContent    = '–';
       document.getElementById('kpi-stock-bajo').textContent    = d.productos_agotados ?? '–';
     }
-    // Pedidos por mes chart
-    const canvasMes = document.getElementById('canvas-pedidos-mes');
-    let dataMes = d.pedidos_por_mes && d.pedidos_por_mes.length > 0 ? d.pedidos_por_mes : [
-      { mes: 'Jul', total_pedidos: 30 }, { mes: 'Jun', total_pedidos: 22 },
-      { mes: 'May', total_pedidos: 25 }, { mes: 'Abr', total_pedidos: 15 },
-      { mes: 'Mar', total_pedidos: 19 }, { mes: 'Feb', total_pedidos: 12 }
-    ];
-    if (canvasMes && typeof Chart !== 'undefined') {
-      if (_chartMes) _chartMes.destroy();
-      _chartMes = new Chart(canvasMes, {
-        type: 'bar',
-        data: {
-          labels: dataMes.map(r => r.mes).reverse(),
-          datasets: [{ label: 'Pedidos', data: dataMes.map(r => Number(r.total_pedidos)).reverse(), backgroundColor: '#ff6a00', borderRadius: 6 }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-      });
-    }
-    // Top productos chart
-    const canvasTop = document.getElementById('canvas-top-productos');
-    let dataTop = d.top_productos && d.top_productos.length > 0 ? d.top_productos : [
-      { nombre: 'Banner Publicitario', total_vendido: 45 },
-      { nombre: 'Polos con DTF', total_vendido: 30 },
-      { nombre: 'Vinil Decorativo', total_vendido: 25 },
-      { nombre: 'Tarjetas (Millar)', total_vendido: 20 }
-    ];
-    if (canvasTop && typeof Chart !== 'undefined') {
-      if (_chartTop) _chartTop.destroy();
-      _chartTop = new Chart(canvasTop, {
-        type: 'doughnut',
-        data: {
-          labels: dataTop.map(r => r.nombre),
-          datasets: [{ data: dataTop.map(r => Number(r.total_vendido)), backgroundColor: ['#ff6a00','#ff8c00','#ffb347','#ff2d55','#5856d6','#34c759','#007aff','#ff9500'] }]
-        },
-        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
-      });
-    }
   } catch(e) { console.error('Error cargando dashboard', e); }
 }
 
