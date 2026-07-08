@@ -4012,6 +4012,25 @@ body.dark-mode .horario-box { background: #1e1e30 !important; }
   align-items: center;
   justify-content: center;
   padding: 20px;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.modal-glass.modal-closing {
+  animation: fadeOut 0.3s ease-in forwards;
+}
+
+.modal-glass.modal-closing .modal-content {
+  animation: fadeOutScale 0.25s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .modal-content {
@@ -4057,6 +4076,11 @@ body.dark-mode .horario-box { background: #1e1e30 !important; }
 @keyframes fadeInScale {
   0% { opacity: 0; transform: scale(0.9); }
   100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOutScale {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.9); }
 }
 
 .modal-producto-img-container {

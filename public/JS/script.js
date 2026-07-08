@@ -2090,12 +2090,18 @@ function abrirModalProducto(id) {
 
 function cerrarModalProducto(actualizarUI = false) {
   const modal = document.getElementById('producto-modal');
-  modal.style.display = 'none';
-  document.body.style.overflow = '';
-  if (actualizarUI && categoriaActual) {
-    // Re-renderizar la cuadrícula para actualizar el texto verde "✅ X en carrito"
-    mostrarProductosDeCategoria(categoriaActual);
-  }
+  modal.classList.add('modal-closing');
+  
+  setTimeout(() => {
+    modal.style.display = 'none';
+    modal.classList.remove('modal-closing');
+    document.body.style.overflow = '';
+    
+    if (actualizarUI && categoriaActual) {
+      // Re-renderizar la cuadrícula para actualizar el texto verde "✅ X en carrito"
+      mostrarProductosDeCategoria(categoriaActual);
+    }
+  }, 250); // Tiempo que dura la animación CSS (0.25s)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
