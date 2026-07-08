@@ -2077,8 +2077,8 @@ function abrirModalProducto(id) {
           <input type="number" class="cantidad-input" id="cantidad-${producto.id}" value="${cantidadActual}" min="0" max="${producto.stock}" ${agotado ? 'disabled' : ''}>
           <button type="button" class="cantidad-btn cantidad-sumar" data-articulo="${producto.id}" aria-label="Sumar" ${agotado ? 'disabled' : ''}>+</button>
         </div>
-        <button type="button" class="modal-btn-add btn-consultar-disponibilidad" data-articulo="${producto.id}" ${agotado ? 'disabled' : ''} onclick="cerrarModalProducto(true)">
-          ${agotado ? 'Sin stock' : (cantidadActual > 0 ? 'Actualizar pedido' : 'Añadir a mi pedido')}
+        <button type="button" class="modal-btn-add btn-consultar-disponibilidad" data-articulo="${producto.id}" ${agotado || cantidadActual === 0 ? 'disabled' : ''} onclick="cerrarModalProducto(true)">
+          ${agotado ? 'Sin stock' : (cantidadActual > 0 ? 'Actualizar pedido' : 'Selecciona una cantidad')}
         </button>
       </div>
     </div>
@@ -2134,10 +2134,9 @@ document.getElementById('detalle-orden-select')?.addEventListener('change', () =
 });
 
 function cambiarCantidad(productoId, delta) {
-  const productos = productosPorCategoriaCache[categoriaActual] || [];
-  const producto = productos.find(p => String(p.id) === String(productoId));
+  const producto = PRODUCTOS_GLOBAL.find(p => String(p.id) === String(productoId));
   if (!producto) return;
-  const limite = producto.stock; // límite real, tomado del inventario del admin
+  const limite = producto.stock;
 
   const actual = cantidadesSeleccionadas[productoId] || 0;
   const nueva = Math.min(limite, Math.max(0, actual + delta));
@@ -2156,7 +2155,18 @@ function cambiarCantidad(productoId, delta) {
   const input = document.getElementById(`cantidad-${productoId}`);
   if (input) input.value = nueva;
 
-  carritoGlobal[categoriaActual] = { ...cantidadesSeleccionadas };
+  const btnAñadir = document.querySelector(`.modal-btn-add[data-articulo="${productoId}"]`);
+  if (btnAñadir) {
+    if (nueva > 0) {
+      btnAñadir.disabled = false;
+      btnAñadir.textContent = 'Añadir a mi pedido';
+    } else {
+      btnAñadir.disabled = true;
+      btnAñadir.textContent = 'Selecciona una cantidad';
+    }
+  }
+
+  carritoGlobal[categoriaActual || producto.categoria] = { ...cantidadesSeleccionadas };
   guardarCarrito();
 
   actualizarResumen();
@@ -2225,21 +2235,23 @@ function actualizarBadgeCarrito() {
   }
 }
 
-if (detalleGrid) {
-  detalleGrid.addEventListener('click', e => {
-    const btnSumar = e.target.closest('.cantidad-sumar');
-    const btnRestar = e.target.closest('.cantidad-restar');
-    const btnConsultar = e.target.closest('.btn-consultar-disponibilidad');
-    if (btnSumar && !btnSumar.disabled) cambiarCantidad(btnSumar.dataset.articulo, 1);
-    if (btnRestar && !btnRestar.disabled) cambiarCantidad(btnRestar.dataset.articulo, -1);
-    if (btnConsultar && !btnConsultar.disabled) {
-      if (!cantidadesSeleccionadas[btnConsultar.dataset.articulo]) {
-        cambiarCantidad(btnConsultar.dataset.articulo, 1);
-      }
-      document.getElementById('btn-detalle-pedir')?.click();
+// Delegación global para botones sumar y restar (así funciona dentro del modal y fuera)
+document.addEventListener('click', e => {
+  const btnSumar = e.target.closest('.cantidad-sumar');
+  const btnRestar = e.target.closest('.cantidad-restar');
+  const btnConsultar = e.target.closest('.btn-consultar-disponibilidad:not(.modal-btn-add)');
+  
+  if (btnSumar && !btnSumar.disabled) cambiarCantidad(btnSumar.dataset.articulo, 1);
+  if (btnRestar && !btnRestar.disabled) cambiarCantidad(btnRestar.dataset.articulo, -1);
+  
+  // Botones de "Consultar" que no sean del modal
+  if (btnConsultar && !btnConsultar.disabled) {
+    if (!cantidadesSeleccionadas[btnConsultar.dataset.articulo]) {
+      cambiarCantidad(btnConsultar.dataset.articulo, 1);
     }
-  });
-}
+    document.getElementById('btn-detalle-pedir')?.click();
+  }
+});
 
 document.getElementById('btn-detalle-pedir')?.addEventListener('click', async () => {
   const seleccion = obtenerSeleccionCompleta();
