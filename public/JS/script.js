@@ -185,10 +185,17 @@ function actualizarBotonAbrirCuenta() {
  * si hay sesión, dice "Cerrar Sesión" y cierra sesión como antes.
  */
 function actualizarBotonSesion() {
-  const btn = document.getElementById('btn-logout-desktop');
-  if (!btn) return;
   const haySesion = localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('token');
-  btn.querySelector('span').textContent = haySesion ? 'Cerrar Sesión' : 'Iniciar Sesión';
+  
+  const btnDesktop = document.getElementById('btn-logout-desktop');
+  if (btnDesktop) {
+    btnDesktop.querySelector('span').textContent = haySesion ? 'Cerrar Sesión' : 'Iniciar Sesión';
+  }
+  
+  const btnMovil = document.getElementById('btn-logout-movil');
+  if (btnMovil) {
+    btnMovil.textContent = haySesion ? 'Cerrar Sesión' : 'Iniciar Sesión';
+  }
 }
 
 /**
@@ -523,7 +530,16 @@ document.getElementById('btn-logout-desktop')?.addEventListener('click', (e) => 
     mostrarPantallaAuth();
   }
 });
-document.getElementById('btn-logout-movil')?.addEventListener('click', hacerLogout);
+
+document.getElementById('btn-logout-movil')?.addEventListener('click', (e) => {
+  const haySesion = localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('token');
+  if (haySesion) {
+    hacerLogout(e);
+  } else {
+    mostrarPantallaAuth();
+    document.getElementById('menu-movil')?.classList.remove('abierto'); // Close mobile menu when opening login
+  }
+});
 
 // ══════════════════════════════════════════
 //   MÓDULO: NAVEGACIÓN Y VISTAS (SPA)
