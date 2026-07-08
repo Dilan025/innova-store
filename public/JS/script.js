@@ -1351,8 +1351,7 @@ document.querySelectorAll('[data-vista]').forEach(el => {
   });
 });
 
-// Inicializar la primera vista (según el rol de la sesión activa, si existe)
-irAVista(esAdministrador() ? 'vista-admin' : 'vista-inicio');
+// La inicialización de vista (según el rol) se hace en el evento 'load' al final
 
 // ══════════════════════════════════════════
 //   MÓDULO: MENÚ MÓVIL
@@ -2937,17 +2936,22 @@ document.addEventListener('click', e => {
 // Manejo del historial de navegación (Botones Atrás/Adelante del navegador)
 window.addEventListener('popstate', () => {
   const hash = window.location.hash.substring(1);
-  if (hash && document.getElementById(hash)) {
+  const baseHash = hash.split('/')[0];
+  if (baseHash && document.getElementById(baseHash)) {
     irAVista(hash, false);
   } else {
-    irAVista('vista-inicio', false);
+    irAVista(esAdministrador() ? 'vista-admin' : 'vista-inicio', false);
   }
 });
 
 // Al cargar la página, ir a la vista correspondiente si hay un hash
 window.addEventListener('load', () => {
   const hash = window.location.hash.substring(1);
-  if (hash && document.getElementById(hash)) {
+  const baseHash = hash.split('/')[0];
+  if (baseHash && document.getElementById(baseHash)) {
     irAVista(hash, false);
+  } else {
+    // Si no hay hash o no es válido, inicializamos con la vista según el rol
+    irAVista(esAdministrador() ? 'vista-admin' : 'vista-inicio', true);
   }
 });
