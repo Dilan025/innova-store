@@ -861,6 +861,7 @@ function activarTabAdmin(tab, updateHistory = true) {
   if (tab === 'clientes') cargarClientesAdmin();
   if (tab === 'pedidos') cargarHistorialPedidosAdmin();
   if (tab === 'reportes') cargarMovimientosStockAdmin();
+  if (tab === 'cupones') cargarAdminCupones();
   if (tab === 'configuracion') cargarConfiguracionAdmin();
 
   if (updateHistory) {
