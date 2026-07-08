@@ -3944,7 +3944,7 @@ body.dark-mode .horario-box { background: #1e1e30 !important; }
 }
 
 /* Estilos para el input numérico en las tarjetas de producto */
-.prod-cant-selector .cantidad-input {
+.cantidad-selector .cantidad-input {
   width: 50px;
   text-align: center;
   font-size: 1rem;
@@ -3956,12 +3956,12 @@ body.dark-mode .horario-box { background: #1e1e30 !important; }
   -moz-appearance: textfield;
 }
 
-.prod-cant-selector .cantidad-input::-webkit-outer-spin-button,
-.prod-cant-selector .cantidad-input::-webkit-inner-spin-button {
+.cantidad-selector .cantidad-input::-webkit-outer-spin-button,
+.cantidad-selector .cantidad-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.prod-cant-selector .cantidad-input:focus {
+.cantidad-selector .cantidad-input:focus {
   border-bottom: 2px solid var(--color-primario);
 }
