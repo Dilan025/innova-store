@@ -544,7 +544,11 @@ function esAdministrador() {
   return obtenerUsuarioActual().rol === 'admin';
 }
 
-function irAVista(id, updateHistory = true) {
+function irAVista(fullId, updateHistory = true) {
+  const parts = fullId.split('/');
+  let id = parts[0];
+  const subId = parts[1];
+
   const userData = obtenerUsuarioActual();
   const esAdmin = esAdministrador();
   const haySesion = localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('token');
@@ -613,7 +617,7 @@ function irAVista(id, updateHistory = true) {
 
   if (id === 'vista-mis-pedidos') cargarMisPedidos();
   if (id === 'vista-admin') { setTimeout(() => { cargarKPIs(); cargarDashboardCharts(); }, 200); }
-  if (id === 'vista-admin') inicializarPanelAdmin();
+  if (id === 'vista-admin') inicializarPanelAdmin(subId);
   // MEJORA: recarga las categorías/productos reales cada vez que se entra a
   // esta vista, para que una categoría recién creada en el admin aparezca
   // de inmediato sin tener que recargar toda la página.
@@ -622,8 +626,8 @@ function irAVista(id, updateHistory = true) {
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   if (updateHistory) {
-    if (window.location.hash !== '#' + id) {
-      history.pushState(null, null, '#' + id);
+    if (window.location.hash !== '#' + fullId) {
+      history.pushState(null, null, '#' + fullId);
     }
   }
 }
@@ -832,7 +836,7 @@ adminTabs?.addEventListener('click', (e) => {
   activarTabAdmin(btn.dataset.adminTab);
 });
 
-function activarTabAdmin(tab) {
+function activarTabAdmin(tab, updateHistory = true) {
   document.querySelectorAll('.admin-tab').forEach(b => b.classList.toggle('active', b.dataset.adminTab === tab));
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.toggle('admin-panel-activo', p.id === `admin-panel-${tab}`));
 
@@ -843,6 +847,13 @@ function activarTabAdmin(tab) {
   if (tab === 'pedidos') cargarHistorialPedidosAdmin();
   if (tab === 'reportes') cargarMovimientosStockAdmin();
   if (tab === 'configuracion') cargarConfiguracionAdmin();
+
+  if (updateHistory) {
+    const newHash = '#vista-admin/' + tab;
+    if (window.location.hash !== newHash) {
+      history.pushState(null, null, newHash);
+    }
+  }
 }
 
 // ── HISTORIAL DE MOVIMIENTOS DE STOCK ──
@@ -869,9 +880,13 @@ async function cargarMovimientosStockAdmin() {
   }
 }
 
-/** Se ejecuta cada vez que se entra a la vista Admin: siempre arranca en el Dashboard */
-function inicializarPanelAdmin() {
-  activarTabAdmin('dashboard');
+/** Se ejecuta cada vez que se entra a la vista Admin */
+function inicializarPanelAdmin(subId) {
+  if (subId) {
+    activarTabAdmin(subId, false);
+  } else {
+    activarTabAdmin('dashboard', false);
+  }
 }
 
 // ── DASHBOARD: KPIs generales ──
