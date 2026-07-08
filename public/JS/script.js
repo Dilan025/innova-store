@@ -602,7 +602,7 @@ function irAVista(fullId, updateHistory = true) {
     el.style.display = esAdmin ? 'none' : '';
   });
   document.querySelectorAll('.nav-link[data-vista="vista-inicio"], .nav-link-m[data-vista="vista-inicio"]').forEach(el => {
-    el.style.display = esAdmin ? 'none' : '';
+    el.style.display = ''; // Siempre visible para todos
   });
   document.body.classList.toggle('modo-admin', esAdmin);
 
