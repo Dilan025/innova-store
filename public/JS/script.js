@@ -619,10 +619,24 @@ function irAVista(fullId, updateHistory = true) {
   if (id === 'vista-mis-pedidos') cargarMisPedidos();
   if (id === 'vista-admin') { setTimeout(() => { cargarKPIs(); cargarDashboardCharts(); }, 200); }
   if (id === 'vista-admin') inicializarPanelAdmin(subId);
-  // MEJORA: recarga las categorías/productos reales cada vez que se entra a
-  // esta vista, para que una categoría recién creada en el admin aparezca
-  // de inmediato sin tener que recargar toda la página.
-  if (id === 'vista-catalogos' && typeof cargarCategoriasYProductos === 'function') cargarCategoriasYProductos();
+  
+  if (id === 'vista-catalogos' && typeof cargarCategoriasYProductos === 'function') {
+    cargarCategoriasYProductos();
+  }
+  
+  if (id === 'vista-detalle-producto') {
+    const catToLoad = subId ? decodeURIComponent(subId) : categoriaActual;
+    if (catToLoad) {
+      if (typeof cargarCategoriasYProductos === 'function' && PRODUCTOS_GLOBAL.length === 0) {
+        cargarCategoriasYProductos().then(() => mostrarProductosDeCategoria(catToLoad));
+      } else {
+        mostrarProductosDeCategoria(catToLoad);
+      }
+    } else {
+      irAVista('vista-catalogos');
+      return;
+    }
+  }
 
   window.scrollTo({ top: 0, behavior: 'instant' });
 
@@ -1966,8 +1980,7 @@ async function cargarCategoriasYProductos() {
 categoriasGrid?.addEventListener('click', (e) => {
   const card = e.target.closest('[data-categoria]');
   if (!card) return;
-  mostrarProductosDeCategoria(card.dataset.categoria);
-  irAVista('vista-detalle-producto');
+  irAVista(`vista-detalle-producto/${encodeURIComponent(card.dataset.categoria)}`);
 });
 
 function mostrarProductosDeCategoria(nombreCategoria, ordenForzado) {
@@ -2251,12 +2264,7 @@ async function cargarProductosDestacados() {
       card.addEventListener('click', async () => {
         const cat = card.dataset.categoria;
         if (cat) {
-          if (Object.keys(productosPorCategoriaCache).length === 0) {
-            irAVista('vista-catalogos'); // Muestra el spinner de carga
-            await cargarCategoriasYProductos(); // Espera a que lleguen los productos reales
-          }
-          mostrarProductosDeCategoria(cat);
-          irAVista('vista-detalle-producto');
+          irAVista(`vista-detalle-producto/${encodeURIComponent(cat)}`);
         }
       });
     });
@@ -2337,7 +2345,7 @@ console.log('📌 Estilo inspirado en BCP con colores propios');
         if (!data.length) { results.innerHTML = '<p style="padding:12px;color:#999;font-size:0.88rem;">Sin resultados.</p>'; results.style.display = 'block'; return; }
         results.innerHTML = data.map(p => `
           <div class="search-result-item" style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;"
-            onclick="mostrarProductosDeCategoria('${p.categoria}');irAVista('vista-detalle-producto');inp_close();">
+            onclick="irAVista('vista-detalle-producto/${encodeURIComponent(p.categoria)}');inp_close();">
             ${p.imagen ? `<img src="${p.imagen}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">` : '<span style="font-size:1.5rem;">📦</span>'}
             <div>
               <div style="font-weight:600;font-size:0.9rem;">${p.nombre}</div>
