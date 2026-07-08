@@ -1831,7 +1831,7 @@ nav a.active::after {
   gap: 6px;
   font-size: 0.82rem;
   color: #666;
-  margin: 10px 0 14px;
+  margin: auto 0 14px;
 }
 
 .stock-icono {
