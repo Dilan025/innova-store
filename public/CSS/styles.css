@@ -2652,7 +2652,8 @@ footer {
     font-size: 0.78rem;
   }
 
-  .btn-abrir-cuenta {
+  .btn-abrir-cuenta,
+  #btn-logout-desktop {
     display: none;
   }
 
