@@ -2352,6 +2352,8 @@ nav a.active::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
   gap: 10px;
   margin-top: 16px;
   background: #f8fafc;
