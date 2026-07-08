@@ -2015,22 +2015,17 @@ function mostrarProductosDeCategoria(nombreCategoria, ordenForzado) {
     const agotado = p.stock === 0;
     const icono = ICONOS_POR_CATEGORIA[nombreCategoria] || ICONO_CATEGORIA_DEFAULT;
     return `
-    <div class="vista-box articulo-card hover-lift fade-in-up ${agotado ? 'articulo-card--agotado' : ''}" data-articulo="${p.id}" style="animation-delay:${_pidx*0.04}s;">
+    <div class="vista-box articulo-card hover-lift fade-in-up ${agotado ? 'articulo-card--agotado' : ''}" data-articulo="${p.id}" style="animation-delay:${_pidx*0.04}s; cursor: pointer;" onclick="abrirModalProducto(${p.id})">
       <div class="articulo-card-header">
         ${p.imagen ? `<img src="${p.imagen}" alt="${p.nombre}" class="articulo-imagen">` : `<div class="vbox-icon">${icono}</div>`}
         <span class="articulo-precio">S/ ${Number(p.precio).toFixed(2)}</span>
       </div>
       <h3>${p.nombre}</h3>
-      <div class="articulo-stock">
+      <div class="articulo-stock" style="margin-bottom: 0;">
         <span class="stock-icono" aria-hidden="true">📦</span>
         ${agotado ? '<b style="color:#e5304d;">Agotado</b>' : `Stock: <b>${p.stock.toLocaleString('es-PE')}</b> uds.`}
       </div>
-      <div class="cantidad-selector">
-        <button type="button" class="cantidad-btn cantidad-restar" data-articulo="${p.id}" aria-label="Restar" ${agotado ? 'disabled' : ''}>−</button>
-        <input type="number" class="cantidad-input" id="cantidad-${p.id}" value="${cantidadesSeleccionadas[p.id] || 0}" min="0" max="${p.stock}" ${agotado ? 'disabled' : ''}>
-        <button type="button" class="cantidad-btn cantidad-sumar" data-articulo="${p.id}" aria-label="Sumar" ${agotado ? 'disabled' : ''}>+</button>
-      </div>
-      <button type="button" class="btn-consultar-disponibilidad" data-articulo="${p.id}" ${agotado ? 'disabled' : ''}>${agotado ? 'Sin stock' : 'Consultar disponibilidad'}</button>
+      ${cantidadesSeleccionadas[p.id] > 0 ? `<div style="margin-top:10px;font-size:0.85rem;color:var(--color-primario);font-weight:bold;">✅ ${cantidadesSeleccionadas[p.id]} en carrito</div>` : ''}
     </div>
   `;
   }).join('');
@@ -2050,6 +2045,69 @@ function mostrarProductosDeCategoria(nombreCategoria, ordenForzado) {
     };
   }
 }
+
+// MODAL VISTA RÁPIDA DE PRODUCTOS
+function abrirModalProducto(id) {
+  const producto = PRODUCTOS_GLOBAL.find(p => String(p.id) === String(id));
+  if (!producto) return;
+
+  const agotado = producto.stock === 0;
+  const modal = document.getElementById('producto-modal');
+  const modalBody = document.getElementById('producto-modal-body');
+  const icono = ICONOS_POR_CATEGORIA[producto.categoria] || ICONO_CATEGORIA_DEFAULT;
+
+  const cantidadActual = cantidadesSeleccionadas[id] || 0;
+
+  modalBody.innerHTML = `
+    <div class="modal-producto-img-container">
+      ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}">` : `<div class="vbox-icon">${icono}</div>`}
+    </div>
+    <div class="modal-producto-info">
+      <h2>${producto.nombre}</h2>
+      <span class="modal-producto-precio">S/ ${Number(producto.precio).toFixed(2)}</span>
+      ${producto.descripcion ? `<p class="modal-producto-desc">${producto.descripcion}</p>` : ''}
+      <div class="modal-producto-stock">
+        <span class="stock-icono" aria-hidden="true">📦</span>
+        ${agotado ? '<b style="color:#e5304d;">Agotado</b>' : `Stock: <b>${producto.stock.toLocaleString('es-PE')}</b> unidades disponibles`}
+      </div>
+      
+      <div class="modal-producto-actions">
+        <div class="cantidad-selector" style="margin:0;">
+          <button type="button" class="cantidad-btn cantidad-restar" data-articulo="${producto.id}" aria-label="Restar" ${agotado ? 'disabled' : ''}>−</button>
+          <input type="number" class="cantidad-input" id="cantidad-${producto.id}" value="${cantidadActual}" min="0" max="${producto.stock}" ${agotado ? 'disabled' : ''}>
+          <button type="button" class="cantidad-btn cantidad-sumar" data-articulo="${producto.id}" aria-label="Sumar" ${agotado ? 'disabled' : ''}>+</button>
+        </div>
+        <button type="button" class="modal-btn-add btn-consultar-disponibilidad" data-articulo="${producto.id}" ${agotado ? 'disabled' : ''} onclick="cerrarModalProducto(true)">
+          ${agotado ? 'Sin stock' : (cantidadActual > 0 ? 'Actualizar pedido' : 'Añadir a mi pedido')}
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden'; // Evitar scroll de fondo
+}
+
+function cerrarModalProducto(actualizarUI = false) {
+  const modal = document.getElementById('producto-modal');
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+  if (actualizarUI && categoriaActual) {
+    // Re-renderizar la cuadrícula para actualizar el texto verde "✅ X en carrito"
+    mostrarProductosDeCategoria(categoriaActual);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('producto-modal');
+  const closeBtn = document.getElementById('producto-modal-close');
+  if (modal && closeBtn) {
+    closeBtn.addEventListener('click', () => cerrarModalProducto());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) cerrarModalProducto();
+    });
+  }
+});
 
 // NUEVO: función de ordenación de productos.
 function ordenarProductos(productos, criterio) {
