@@ -623,13 +623,17 @@ function irAVista(fullId, updateHistory = true) {
   document.body.classList.toggle('modo-admin', esAdmin);
   document.documentElement.classList.toggle('modo-admin', esAdmin);
 
-  if (id === 'vista-pedido' && userData.correo) {
-    const nom = document.getElementById('pedido-nombre');
-    const tel = document.getElementById('pedido-telefono');
-    const cor = document.getElementById('pedido-correo');
-    if (nom && !nom.value) nom.value = userData.nombre || '';
-    if (tel && !tel.value) tel.value = userData.telefono || '';
-    if (cor && !cor.value) cor.value = userData.correo || '';
+  if (id === 'vista-pedido') {
+    if (userData.correo) {
+      const nom = document.getElementById('pedido-nombre');
+      const tel = document.getElementById('pedido-telefono');
+      const cor = document.getElementById('pedido-correo');
+      if (nom && !nom.value) nom.value = userData.nombre || '';
+      if (tel && !tel.value) tel.value = userData.telefono || '';
+      if (cor && !cor.value) cor.value = userData.correo || '';
+    }
+    // Retrasar el calculo unos milisegundos para asegurar que el carrito/inputs estén listos
+    setTimeout(() => typeof calcularMontoTotalFormulario === 'function' && calcularMontoTotalFormulario(), 100);
   }
 
   if (id === 'vista-mis-pedidos') cargarMisPedidos();
@@ -1644,7 +1648,7 @@ async function cargarProductosPorCategoria(categoria) {
     }
 
     pedidoProductoEl.innerHTML = '<option value="">Seleccione un producto</option>' +
-      productos.map(p => `<option value="${p.id}" data-stock="${p.stock}" ${p.stock === 0 ? 'disabled' : ''}>${p.nombre}${p.stock === 0 ? ' (Agotado)' : ' (Stock: ' + p.stock + ')'}</option>`).join('');
+      productos.map(p => `<option value="${p.id}" data-precio="${p.precio || 0}" data-stock="${p.stock}" ${p.stock === 0 ? 'disabled' : ''}>${p.nombre}${p.stock === 0 ? ' (Agotado)' : ' (Stock: ' + p.stock + ')'}</option>`).join('');
     pedidoProductoWrapper.style.display = '';
     if (pedidoStockInfoEl) pedidoStockInfoEl.textContent = '';
   } catch (e) {
@@ -1652,6 +1656,35 @@ async function cargarProductosPorCategoria(categoria) {
     pedidoProductoWrapper.style.display = 'none';
   }
 }
+
+function calcularMontoTotalFormulario() {
+  const totalEl = document.getElementById('pedido-total-monto');
+  if (!totalEl) return;
+  
+  const selectProducto = document.getElementById('pedido-producto');
+  const inputCantidad = document.getElementById('pedido-cantidad');
+  
+  let subtotal = 0;
+  if (selectProducto && selectProducto.value && inputCantidad && inputCantidad.value) {
+    const opcionSeleccionada = selectProducto.options[selectProducto.selectedIndex];
+    const precio = Number(opcionSeleccionada.getAttribute('data-precio') || 0);
+    const cant = Number(inputCantidad.value) || 0;
+    subtotal = precio * cant;
+  } else {
+    subtotal = obtenerSeleccionCompleta().reduce((acc, item) => {
+      const pList = productosPorCategoriaCache[item.categoria] || [];
+      const prod = pList.find(p => String(p.id) === String(item.productoId));
+      return acc + (prod ? Number(prod.precio) * item.cantidad : 0);
+    }, 0);
+  }
+  
+  const descuento = (typeof cuponAplicado !== 'undefined' && cuponAplicado) ? cuponAplicado.descuento : 0;
+  const totalFinal = Math.max(0, subtotal - descuento);
+  totalEl.textContent = 'S/ ' + totalFinal.toFixed(2);
+}
+
+if(pedidoProductoEl) pedidoProductoEl.addEventListener('change', calcularMontoTotalFormulario);
+if(pedidoCantidadEl) pedidoCantidadEl.addEventListener('input', calcularMontoTotalFormulario);
 
 pedidoServicioEl?.addEventListener('change', () => {
   cargarProductosPorCategoria(pedidoServicioEl.value);
@@ -2561,6 +2594,7 @@ document.getElementById('btn-validar-cupon')?.addEventListener('click', async ()
       msg.innerHTML = `<span style="color:#25d366;">✅ Cupón válido. Descuento: -S/ ${d.descuento.toFixed(2)}</span>`;
       if (inp) inp.disabled = true;
       document.getElementById('btn-validar-cupon').disabled = true;
+      if (typeof calcularMontoTotalFormulario === 'function') calcularMontoTotalFormulario();
     } else {
       cuponAplicado = null;
       msg.innerHTML = `<span style="color:#e5304d;">❌ ${d.error}</span>`;
@@ -2576,6 +2610,7 @@ function resetCupon() {
   if (inp) { inp.value = ''; inp.disabled = false; }
   if (msg) msg.innerHTML = '';
   if (btn) btn.disabled = false;
+  if (typeof calcularMontoTotalFormulario === 'function') calcularMontoTotalFormulario();
 }
 
 
