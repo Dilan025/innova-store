@@ -544,7 +544,7 @@ function esAdministrador() {
   return obtenerUsuarioActual().rol === 'admin';
 }
 
-function irAVista(id) {
+function irAVista(id, updateHistory = true) {
   const userData = obtenerUsuarioActual();
   const esAdmin = esAdministrador();
   const haySesion = localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('token');
@@ -620,6 +620,12 @@ function irAVista(id) {
   if (id === 'vista-catalogos' && typeof cargarCategoriasYProductos === 'function') cargarCategoriasYProductos();
 
   window.scrollTo({ top: 0, behavior: 'instant' });
+
+  if (updateHistory) {
+    if (window.location.hash !== '#' + id) {
+      history.pushState(null, null, '#' + id);
+    }
+  }
 }
 
 // --- FUNCIONES PARA CONECTAR LAS TABLAS A LA BASE DE DATOS ---
@@ -2910,5 +2916,23 @@ if (btnProcesarCarrito) {
 document.addEventListener('click', e => {
   if (carritoDropdown && carritoDropdown.style.display === 'flex' && !e.target.closest('#carrito-wrapper')) {
     carritoDropdown.style.display = 'none';
+  }
+});
+
+// Manejo del historial de navegación (Botones Atrás/Adelante del navegador)
+window.addEventListener('popstate', () => {
+  const hash = window.location.hash.substring(1);
+  if (hash && document.getElementById(hash)) {
+    irAVista(hash, false);
+  } else {
+    irAVista('vista-inicio', false);
+  }
+});
+
+// Al cargar la página, ir a la vista correspondiente si hay un hash
+window.addEventListener('load', () => {
+  const hash = window.location.hash.substring(1);
+  if (hash && document.getElementById(hash)) {
+    irAVista(hash, false);
   }
 });
