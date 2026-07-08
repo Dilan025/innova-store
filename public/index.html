@@ -72,6 +72,24 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <!-- jsQR (detección y recorte automático de QR) -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+  <script>
+    // Anti-FOUC: Aplicar modo-admin inmediatamente si el usuario es administrador
+    try {
+      const ud = JSON.parse(localStorage.getItem('userData') || '{}');
+      if (ud.rol === 'admin') {
+        document.documentElement.classList.add('modo-admin');
+      }
+    } catch (e) {}
+  </script>
+  <style>
+    /* Ocultar elementos exclusivos de cliente para el administrador */
+    html.modo-admin [data-vista="vista-catalogos"],
+    html.modo-admin [data-vista="vista-pedido"],
+    html.modo-admin [data-vista="vista-mis-pedidos"] {
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
 
