@@ -2635,7 +2635,9 @@ function mostrarQRPago(metodo) {
   const cfg = window._configPublica || {};
   const qr = metodo === 'Yape' ? cfg.qr_yape : metodo === 'Plin' ? cfg.qr_plin : null;
   if (qr) {
-    img.src = qr; titulo.textContent = `QR de pago — ${metodo}`; box.style.display = 'block';
+    img.src = qr + '?v=' + Date.now(); 
+    titulo.textContent = `QR de pago — ${metodo}`; 
+    box.style.display = 'block';
   } else {
     box.style.display = 'none';
   }
