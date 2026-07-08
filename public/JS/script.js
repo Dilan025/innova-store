@@ -2832,7 +2832,7 @@ function renderizarCarritoDropdown() {
   
   const seleccion = obtenerSeleccionCompleta();
   if (seleccion.length === 0) {
-    carritoBody.innerHTML = '<div class=\"carrito-vacio-msg\">Tu carrito está vacío</div>';
+    carritoBody.innerHTML = '<div class="carrito-vacio-msg">Tu carrito está vacío</div>';
     if(carritoTotal) carritoTotal.textContent = 'S/ 0.00';
     if(btnProcesarCarrito) btnProcesarCarrito.disabled = true;
     return;
@@ -2848,18 +2848,18 @@ function renderizarCarritoDropdown() {
     const subtotal = precio * item.cantidad;
     totalSoles += subtotal;
     
-    return 
-      <div class=\"carrito-item\">
-        <div class=\"carrito-item-info\">
-          <span class=\"carrito-item-title\">\x \</span>
-          <span class=\"carrito-item-price\">S/ \</span>
+    return `
+      <div class="carrito-item">
+        <div class="carrito-item-info">
+          <span class="carrito-item-title">${item.cantidad}x ${item.nombre}</span>
+          <span class="carrito-item-price">S/ ${subtotal.toFixed(2)}</span>
         </div>
-        <button class=\"carrito-remover-btn\" data-id=\"\\" data-cat=\"\\" title=\"Remover\">✕</button>
+        <button class="carrito-remover-btn" data-id="${item.productoId}" data-cat="${item.categoria}" title="Remover">✕</button>
       </div>
-    ;
+    `;
   }).join('');
   
-  if(carritoTotal) carritoTotal.textContent = S/ \;
+  if(carritoTotal) carritoTotal.textContent = `S/ ${totalSoles.toFixed(2)}`;
 }
 
 if (btnCarritoDropdown) {
