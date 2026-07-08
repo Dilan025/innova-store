@@ -2017,7 +2017,7 @@ function mostrarProductosDeCategoria(nombreCategoria, ordenForzado) {
     return `
     <div class="vista-box articulo-card hover-lift fade-in-up ${agotado ? 'articulo-card--agotado' : ''}" data-articulo="${p.id}" style="animation-delay:${_pidx*0.04}s; cursor: pointer;" onclick="abrirModalProducto(${p.id})">
       <div class="articulo-card-header">
-        ${p.imagen ? `<img src="${p.imagen}" alt="${p.nombre}" class="articulo-imagen">` : `<div class="vbox-icon">${icono}</div>`}
+        ${p.imagen ? `<img src="${p.imagen}?v=2" alt="${p.nombre}" class="articulo-imagen">` : `<div class="vbox-icon">${icono}</div>`}
         <span class="articulo-precio">S/ ${Number(p.precio).toFixed(2)}</span>
       </div>
       <h3>${p.nombre}</h3>
