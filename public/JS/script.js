@@ -696,7 +696,12 @@ async function cargarMisPedidos() {
         <td>#${p.id}</td>
         <td>${new Date(p.fecha).toLocaleDateString('es-PE')}</td>
         <td class="tabla-servicio">${p.servicio}${p.items && p.items.length > 1 ? ` <span class="badge-multi">${p.items.length} productos</span>` : ` (Cant: ${p.cantidad})`}</td>
-        <td>${detalleItems}<br><small style="color:#aaa;">${timeline}</small></td>
+        <td>
+          ${detalleItems}<br>
+          <span style="color:#ff6a00; font-size:0.8rem;">🚚 ${p.metodo_entrega || 'Recojo en tienda'}</span>
+          ${p.direccion_entrega ? `<br><span style="color:#777; font-size:0.75rem;">📍 ${p.direccion_entrega}</span>` : ''}
+          <br><small style="color:#aaa; display:inline-block; margin-top:4px;">${timeline}</small>
+        </td>
         <td>${p.archivo ? `<a href="${p.archivo}" target="_blank" class="tabla-link-archivo">Ver 📄</a>` : '-'}</td>
         <td>${generarCeldaEstadoCliente(p)}</td>
         <td><button onclick="descargarRecibo(${p.id})" style="background:none;border:1.5px solid #ddd;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.8rem;" title="Descargar PDF">📥 PDF</button></td>
@@ -789,8 +794,21 @@ function generarFilaAdmin(p, esPendiente) {
     <tr style="border-bottom: 1px solid #eee;">
       <td style="padding:10px;"><b>#${p.id}</b><br><small>${new Date(p.fecha).toLocaleDateString()}</small></td>
       <td style="padding:10px;"><b>${p.nombre}</b><br><a href="mailto:${p.correo}">${p.correo}</a><br><a href="https://wa.me/51${p.telefono.replace(/\s+/g,'')}" target="_blank" style="color:#25d366; font-weight:bold;">WhatsApp 💬</a></td>
-      <td style="padding:10px; color:#ff2d55; font-weight:bold;">${detalleServicio}<br><span style="color:#666; font-weight:normal; font-size:0.85rem;">${p.detalles}</span></td>
-      <td style="padding:10px;">${p.archivo ? `<a href="${p.archivo}" target="_blank" style="background:#ffcd00; color:#333; padding:5px 10px; border-radius:5px; text-decoration:none; font-weight:bold;">Descargar</a>` : 'N/A'}</td>
+      <td style="padding:10px; color:#ff2d55; font-weight:bold;">
+        ${detalleServicio}<br><span style="color:#666; font-weight:normal; font-size:0.85rem;">${p.detalles}</span>
+        <div style="margin-top: 5px; background: #fff4e6; padding: 5px; border-radius: 4px; font-size: 0.8rem; color: #d35400;">
+          <b>🚚 ${p.metodo_entrega || 'Recojo en tienda'}</b>
+          ${p.direccion_entrega ? `<br>📍 ${p.direccion_entrega}` : ''}
+        </div>
+        <div style="margin-top: 5px; font-size: 0.8rem; color: #1a1a2e;">
+          <b>💳 Pago:</b> ${p.metodo_pago || 'No especificado'}
+        </div>
+      </td>
+      <td style="padding:10px;">
+        ${p.archivo ? `<a href="${p.archivo}" target="_blank" style="background:#ffcd00; color:#333; padding:5px 10px; border-radius:5px; text-decoration:none; font-weight:bold; margin-bottom: 5px; display: inline-block;">Ver Diseño</a><br>` : ''}
+        ${p.comprobante ? `<a href="${p.comprobante}" target="_blank" style="background:#4cd137; color:#fff; padding:5px 10px; border-radius:5px; text-decoration:none; font-weight:bold; display: inline-block;">Ver Comprobante</a>` : ''}
+        ${!p.archivo && !p.comprobante ? 'N/A' : ''}
+      </td>
       <td style="padding:10px; min-width: 130px;">
         ${etiquetaConfirmado}
         ${btnEstado}
@@ -1734,6 +1752,27 @@ function validarFormularioPedido() {
     }
   }
 
+  // Validar método de entrega (obligatorio)
+  const metodoEntregaEl = document.getElementById('pedido-metodo-entrega');
+  const direccionEl = document.getElementById('pedido-direccion');
+  let entregaOk = true;
+  if (metodoEntregaEl) {
+    if (!metodoEntregaEl.value) {
+      entregaOk = false;
+      metodoEntregaEl.classList.add('input-invalido');
+      mostrarToast('⚠️ Selecciona un método de entrega.');
+    } else {
+      metodoEntregaEl.classList.remove('input-invalido');
+      if (metodoEntregaEl.value === 'Envío a domicilio' && direccionEl && direccionEl.value.trim() === '') {
+        entregaOk = false;
+        direccionEl.classList.add('input-invalido');
+        mostrarToast('⚠️ Ingresa la dirección de envío completa.');
+      } else if (direccionEl) {
+        direccionEl.classList.remove('input-invalido');
+      }
+    }
+  }
+
 
   // Validar comprobante separado
   let archivoOk = true;
@@ -1750,8 +1789,8 @@ function validarFormularioPedido() {
     compInputEl?.classList.remove('input-invalido');
   }
 
-  if (!nombreOk || !telefonoOk || !correoOk || !servicioOk || !cantidadOk || !metodoPagoOk || !archivoOk) {
-    const primerInvalido = [pedidoNombreEl, pedidoTelefonoEl, pedidoCorreoEl, pedidoServicioEl, pedidoCantidadEl, metodoPagoEl, compInputEl]
+  if (!nombreOk || !telefonoOk || !correoOk || !servicioOk || !cantidadOk || !metodoPagoOk || !archivoOk || !entregaOk) {
+    const primerInvalido = [pedidoNombreEl, pedidoTelefonoEl, pedidoCorreoEl, pedidoServicioEl, pedidoCantidadEl, metodoEntregaEl, direccionEl, metodoPagoEl, compInputEl]
       .find(el => el && el.classList.contains('input-invalido'));
     primerInvalido?.focus();
     primerInvalido?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1841,6 +1880,12 @@ formPedido?.addEventListener('submit', async (e) => {
   // Agregar método de pago y cupón
   const metodoPagoEl = document.getElementById('pedido-metodo-pago');
   if (metodoPagoEl) formData.append('metodo_pago', metodoPagoEl.value);
+  
+  const metodoEntregaEl = document.getElementById('pedido-metodo-entrega');
+  if (metodoEntregaEl) formData.append('metodo_entrega', metodoEntregaEl.value);
+  const direccionEl = document.getElementById('pedido-direccion');
+  if (direccionEl) formData.append('direccion_entrega', direccionEl.value);
+
   const cuponEl = document.getElementById('pedido-cupon');
   if (cuponEl) formData.append('cupon', cuponEl.value);
 
@@ -2936,6 +2981,23 @@ document.getElementById('pedido-metodo-pago')?.addEventListener('change', functi
 });
 
 
+
+document.getElementById('pedido-metodo-entrega')?.addEventListener('change', function() {
+  const direccionBox = document.getElementById('pedido-direccion-box');
+  const direccionInput = document.getElementById('pedido-direccion');
+  if (direccionBox) {
+    if (this.value === 'Envío a domicilio') {
+      direccionBox.style.display = 'flex';
+      if (direccionInput) direccionInput.required = true;
+    } else {
+      direccionBox.style.display = 'none';
+      if (direccionInput) {
+        direccionInput.required = false;
+        direccionInput.value = '';
+      }
+    }
+  }
+});
 
 // Mostrar barra de búsqueda para clientes logueados
 function toggleSearchBar(show) {

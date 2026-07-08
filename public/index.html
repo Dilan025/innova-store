@@ -7,6 +7,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, shrink-to-fit=no">
   <title>Innova SCAC - Diseño y Tecnología</title>
   
+  <!-- Forzar actualización de cache -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.update();
+        }
+      });
+    }
+    const version = "1.0.1";
+    if (localStorage.getItem('app_version') !== version) {
+      localStorage.setItem('app_version', version);
+      location.reload(true);
+    }
+  </script>
+  
   <link rel="stylesheet" href="CSS/styles.css?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -552,6 +568,19 @@
                   <span class="dropzone-sub">Click para explorar (Opcional)</span>
                 </label>
                 <div id="pedido-archivo-preview" class="archivo-preview"></div>
+              </div>
+
+              <div class="input-group input-group--select" style="margin-top:20px;">
+                <select id="pedido-metodo-entrega" required>
+                  <option value="" disabled selected>Selecciona método de entrega</option>
+                  <option value="Recojo en tienda">🏬 Recojo en tienda</option>
+                  <option value="Envío a domicilio">🚚 Envío a domicilio</option>
+                </select>
+              </div>
+              
+              <div class="input-group" id="pedido-direccion-box" style="display:none;">
+                <span class="input-icon">📍</span>
+                <input type="text" id="pedido-direccion" placeholder="Dirección de envío completa">
               </div>
 
               <div class="input-group input-group--select" style="margin-top:20px;">

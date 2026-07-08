@@ -1,4 +1,4 @@
-const CACHE = 'innova-v1';
+const CACHE = 'innova-v3';
 const ASSETS = ['/', '/index.html', '/CSS/styles.css', '/JS/script.js', '/IMG/logo.png'];
 
 self.addEventListener('install', e => {

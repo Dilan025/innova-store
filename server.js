@@ -224,6 +224,8 @@ db.serialize(() => {
     db.run(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS producto_id INTEGER`);
     db.run(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS metodo_pago TEXT`);
     db.run(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS comprobante TEXT`);
+    db.run(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS metodo_entrega TEXT DEFAULT 'Recojo en tienda'`);
+    db.run(`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS direccion_entrega TEXT`);
     
     db.run(`ALTER TABLE configuracion ADD COLUMN IF NOT EXISTS qr_yape TEXT`);
     db.run(`ALTER TABLE configuracion ADD COLUMN IF NOT EXISTS qr_plin TEXT`);
@@ -551,7 +553,7 @@ app.post('/api/pedidos-carrito', verificarToken, upload.fields([{ name: 'archivo
 
 // ── PEDIDO SIMPLE (con archivo adjunto) ──────────────────────────────────────
 app.post('/api/pedidos', verificarToken, upload.fields([{ name: 'archivo', maxCount: 1 }, { name: 'comprobante', maxCount: 1 }]), (req, res) => {
-    const { servicio, cantidad, detalles, producto_id, metodo_pago } = req.body;
+    const { servicio, cantidad, detalles, producto_id, metodo_pago, metodo_entrega, direccion_entrega } = req.body;
     const archivoUrl = (req.files && req.files['archivo']) ? '/uploads/' + req.files['archivo'][0].filename : null;
     const comprobanteUrl = (req.files && req.files['comprobante']) ? '/uploads/' + req.files['comprobante'][0].filename : null;
     
@@ -572,8 +574,8 @@ app.post('/api/pedidos', verificarToken, upload.fields([{ name: 'archivo', maxCo
         if (err) return res.status(500).json({ error: 'Error al verificar stock.' });
 
         if (!producto) {
-            db.run("INSERT INTO pedidos (usuario_id, servicio, cantidad, detalles, archivo, producto_id, metodo_pago, comprobante) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                [req.usuario.id, servicio, cantidadNum, detalles, archivoUrl, null, req.body.metodo_pago, comprobanteUrl], function(err) {
+            db.run("INSERT INTO pedidos (usuario_id, servicio, cantidad, detalles, archivo, producto_id, metodo_pago, comprobante, metodo_entrega, direccion_entrega) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [req.usuario.id, servicio, cantidadNum, detalles, archivoUrl, null, req.body.metodo_pago, comprobanteUrl, metodo_entrega || 'Recojo en tienda', direccion_entrega || null], function(err) {
                     if (err) return res.status(500).json({ error: 'Error al guardar pedido.' });
                     res.json({ mensaje: 'Pedido registrado con éxito', id_pedido: this.lastID });
                 });
@@ -593,8 +595,8 @@ app.post('/api/pedidos', verificarToken, upload.fields([{ name: 'archivo', maxCo
                     return;
                 }
 
-                db.run("INSERT INTO pedidos (usuario_id, servicio, cantidad, detalles, archivo, producto_id, metodo_pago, comprobante) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    [req.usuario.id, servicio || producto.nombre, cantidadNum, detalles, archivoUrl, producto.id, req.body.metodo_pago, comprobanteUrl],
+                db.run("INSERT INTO pedidos (usuario_id, servicio, cantidad, detalles, archivo, producto_id, metodo_pago, comprobante, metodo_entrega, direccion_entrega) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    [req.usuario.id, servicio || producto.nombre, cantidadNum, detalles, archivoUrl, producto.id, req.body.metodo_pago, comprobanteUrl, metodo_entrega || 'Recojo en tienda', direccion_entrega || null],
                     function(errInsert) {
                         if (errInsert) {
                             db.run("UPDATE productos SET stock = stock + ? WHERE id = ?", [cantidadNum, producto.id]);
@@ -654,7 +656,7 @@ app.get('/api/catalogos/:servicio', (req, res) => {
 
 // ── RUTAS ADMIN ──────────────────────────────────────────────────────────────
 app.get('/api/admin/pedidos', verificarToken, requiereAdmin, (req, res) => {
-    const sql = `SELECT p.id, p.servicio, p.cantidad, p.detalles, p.archivo, p.fecha, p.estado, u.nombre, u.correo, u.telefono
+    const sql = `SELECT p.id, p.servicio, p.cantidad, p.detalles, p.archivo, p.fecha, p.estado, p.metodo_pago, p.comprobante, p.metodo_entrega, p.direccion_entrega, u.nombre, u.correo, u.telefono
                  FROM pedidos p JOIN usuarios u ON p.usuario_id = u.id ORDER BY p.fecha DESC`;
     db.all(sql, [], (err, pedidos) => {
         if (err) return res.status(500).json({ error: 'Error del servidor.' });
