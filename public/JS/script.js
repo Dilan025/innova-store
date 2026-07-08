@@ -1763,7 +1763,7 @@ function validarFormularioPedido() {
       mostrarToast('⚠️ Selecciona un método de entrega.');
     } else {
       metodoEntregaEl.classList.remove('input-invalido');
-      if (metodoEntregaEl.value === 'Envío a domicilio' && direccionEl && direccionEl.value.trim() === '') {
+      if ((metodoEntregaEl.value === 'Envío a domicilio' || metodoEntregaEl.value === 'Envío interprovincial') && direccionEl && direccionEl.value.trim() === '') {
         entregaOk = false;
         direccionEl.classList.add('input-invalido');
         mostrarToast('⚠️ Ingresa la dirección de envío completa.');
@@ -2986,7 +2986,7 @@ document.getElementById('pedido-metodo-entrega')?.addEventListener('change', fun
   const direccionBox = document.getElementById('pedido-direccion-box');
   const direccionInput = document.getElementById('pedido-direccion');
   if (direccionBox) {
-    if (this.value === 'Envío a domicilio') {
+    if (this.value === 'Envío a domicilio' || this.value === 'Envío interprovincial') {
       direccionBox.style.display = 'flex';
       if (direccionInput) direccionInput.required = true;
     } else {

@@ -4254,8 +4254,9 @@ body.dark-mode .horario-box { background: #1e1e30 !important; }
 }
 #vista-pedido .input-group input[id^="pedido-nombre"],
 #vista-pedido .input-group input[id^="pedido-telefono"],
-#vista-pedido .input-group input[id^="pedido-correo"] {
-  padding-left: 48px;
+#vista-pedido .input-group input[id^="pedido-correo"],
+#vista-pedido .input-group input[id^="pedido-direccion"] {
+    padding-left: 45px;
 }
 
 #vista-pedido .input-group input:focus, 
