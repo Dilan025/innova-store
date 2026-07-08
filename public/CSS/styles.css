@@ -1719,6 +1719,10 @@ nav a.active::after {
    CATÁLOGO — mismos colores del resto del sitio (naranja / blanco)
 ══════════════════════════════════════════ */
 .vista-box {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
   background: #ffffff;
   border-radius: 16px;
   padding: 28px 22px;
