@@ -1073,7 +1073,7 @@ nav a.active::after {
   width: 320px;
   height: 100%;
   background: white;
-  z-index: 1000;
+  z-index: 1005;
   transition: right 0.35s ease;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
   overflow-y: auto;
@@ -3873,6 +3873,17 @@ body.dark-mode .horario-box { background: #1e1e30 !important; }
   margin-top: 10px;
   overflow: hidden;
   animation: fadeIn 0.2s ease-out;
+}
+
+@media (max-width: 640px) {
+  .carrito-dropdown {
+    position: fixed;
+    top: 70px;
+    right: 15px;
+    left: 15px;
+    width: auto;
+    margin-top: 0;
+  }
 }
 
 .carrito-dropdown-header {
