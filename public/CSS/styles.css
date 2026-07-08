@@ -4235,7 +4235,8 @@ body.dark-mode .horario-box { background: #1e1e30 !important; }
 
 #vista-pedido .input-group .input-icon {
   position: absolute;
-  top: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   left: 16px;
   color: #a0a0a0;
   font-size: 1.1rem;
