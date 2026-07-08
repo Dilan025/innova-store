@@ -605,6 +605,7 @@ function irAVista(fullId, updateHistory = true) {
     el.style.display = ''; // Siempre visible para todos
   });
   document.body.classList.toggle('modo-admin', esAdmin);
+  document.documentElement.classList.toggle('modo-admin', esAdmin);
 
   if (id === 'vista-pedido' && userData.correo) {
     const nom = document.getElementById('pedido-nombre');
